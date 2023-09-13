@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,27 +20,203 @@ namespace HelloDungeon
             public float baseDamage;
             public float dexterity;
             public Weapon weapon;
+            public Effect ailment;
         }
         struct Weapon
         {
             public string name;
             public float damage;
-            public Skill effect;
+            public Effect effect;
         }
-        struct Skill
+        struct Effect
         {
             public string name;
-            public int damage;
-            public int duration;
+            public float damage;
+            public float duration;
         }
         bool gameOver;
         bool playerAlive;
         int stageNumber;
+        string className = "";
         Character player;
         Character enemy;
 
+        Character[] chars = new Character[4];
+
 
         //unfinished functions
+        void enemyChoice()
+        {
+
+        }
+
+        void block(Character initiator, ref Character receiver)
+        {
+
+        }
+
+        void shield(Character initiator, ref Character receiver)
+        {
+
+        }
+
+        //actions
+
+        void quickAttack(Character initiator, ref Character receiver)
+        {
+            if (chance(ref receiver, -3))
+            {
+                float damage = (initiator.weapon.damage) * (initiator.dexterity + 1);
+                Console.WriteLine(initiator.name + " hit " + receiver.name + " for " + damage + " damage!!");
+                receiver.health -= damage;
+
+                //chance to add ailment
+                if (initiator.weapon.effect.damage > 0 && chance(ref receiver, 2))
+                {
+                    receiver.ailment = initiator.weapon.effect;
+                }
+            }
+            else
+            {
+                Console.WriteLine("You missed!!");
+            }
+        }
+
+        void strongAttack(Character initiator, ref Character receiver)
+        {
+            if (chance(ref receiver, 2))
+            {
+                float damage = (initiator.weapon.damage + initiator.baseDamage) * (initiator.strength + 1);
+                Console.WriteLine(initiator.name + " hit " + receiver.name + " for " + damage + " damage!!");
+                receiver.health -= damage;
+
+                //chance to add ailment
+                if (initiator.weapon.effect.duration > 0 && chance(ref receiver, 5))
+                {
+                    receiver.ailment = initiator.weapon.effect;
+                }
+            }
+            else
+            {
+                Console.WriteLine("You missed!!");
+            }
+        }
+
+        
+
+        //battle functions
+
+        void Battle()
+        {
+            while (player.health > 0 && enemy.health > 0)
+            {
+                printStats(ref player);
+
+                int playerChoice = getInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
+
+                if (playerChoice == 1)
+                {
+                    strongAttack(player, ref enemy);
+                }
+                else if(playerChoice == 2)
+                {
+                    quickAttack(player, ref enemy);
+                }
+                else if(playerChoice == 3)
+                {
+                    shield(player, ref enemy);
+                }
+                else if(playerChoice == 4)
+                {
+                    dodge(player, ref enemy);
+                }
+                else
+                {
+                    getItem(player);
+                }
+                //then do enemy move (own function)
+
+                bonusDamage();
+            }
+            WinResult();
+        }
+
+        void WinResult()
+        {
+            if(player.health > 0 && enemy.health <= 0)
+            {
+                Console.WriteLine("VICTORY!");
+            }
+            else if(player.health <= 0 && enemy.health > 0)
+            {
+                Console.WriteLine("DEFEAT.");
+                playerAlive = false;
+            }
+        }
+        void bonusDamage()
+        {
+            if (player.ailment.duration != 0)
+            {
+                Console.WriteLine(player.name + " took " + player.ailment.damage + " from " + player.ailment.name + "!!");
+                player.health -= player.ailment.damage;
+                player.ailment.duration--;
+            }
+            if (enemy.ailment.duration != 0)
+            {
+                Console.WriteLine("The " + enemy.name + " took " + enemy.ailment.damage + " from " + enemy.ailment.name + "!!");
+            }
+        }
+
+
+        //   void lvlUP(string character)
+
+
+        //support functions
+
+        //pass 1 for %100, 2 for %50, 3 for #30, 5 for %10, -3 for %70, and -5 for %90
+        bool chance(ref Character enemy, int mod)
+        {
+            if(mod == 1)
+            {
+                return true;
+            }
+            else if(mod == 2)
+            {
+                if((enemy.health %= 2) == 0)
+                {
+                    return true;
+                }
+            }
+            else if (mod == 3)
+            {
+                if ((enemy.health %= 3) == 0)
+                {
+                    return true;
+                }
+            }
+            else if(mod == 5)
+            {
+                if((enemy.health %= 5) == 0)
+                {
+                    return true;
+                }
+            }
+            else if(mod == -3)
+            {
+                if((enemy.health %= 3) != 0)
+                {
+                    return true;
+                }
+            }
+            else // -5
+            {
+                if((enemy.health %= 5) != 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         void assignStats(int selection)
         {
@@ -49,7 +226,9 @@ namespace HelloDungeon
                 player.health = 50;
                 player.strength = 0.5f;
                 player.dexterity = 2;
-                
+                className = "BasketBall Player";
+                getWeapon(ref player, -1);
+
             }
             else if(selection == 2) //businessman
             {
@@ -57,6 +236,8 @@ namespace HelloDungeon
                 player.health = 30;
                 player.strength = 0;
                 player.dexterity = 0;
+                className = "Businessman";
+                getWeapon(ref player, -2);
             }
             else //selection 3 //hobo
             {
@@ -64,6 +245,8 @@ namespace HelloDungeon
                 player.health = 20;
                 player.strength = 0;
                 player.dexterity = 1;
+                className = "Hobo";
+                getWeapon(ref player, -3);
             }
             player.baseDamage = 2;
         }
@@ -71,19 +254,23 @@ namespace HelloDungeon
         void characterCreation()
         {
             bool selectedClass = false;
-            player.name = getText("Enter player name");
             while (!selectedClass)
             {
                 assignStats(getInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", ""));
 
-                printStats(player);
-
                 //have a starting weapon and choose to drop it
 
+                player.name = getText("Enter character name");
+                Console.Clear();
+                proceed();
 
+                printStats(ref player);
 
-            }
-            //change 
+                if(getInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
+                {
+                    selectedClass = true;
+                }
+            } 
         }
 
         void getWeapon(ref Character equipee, int selection)
@@ -162,53 +349,6 @@ namespace HelloDungeon
 
         }
 
-        void quickAttack(Character initiator, ref Character receiver)
-        {
-            receiver.health -= initiator.baseDamage * (initiator.strength + 1);
-        }
-
-        void Battle()
-        {
-            printStats(player);
-
-            if(player.health <= 0 || enemy.health <= 0)
-            {
-                WinResult();
-            }
-        }
-
-        void WinResult()
-        {
-            if(player.health > 0 && enemy.health <= 0)
-            {
-                Console.WriteLine("VICTORY!");
-            }
-            else if(player.health <= 0 && enemy.health > 0)
-            {
-                Console.WriteLine("DEFEAT.");
-                playerAlive = false;
-            }
-        }
-        void weaponDamage()
-        {
-            if (player.weapon.name == "Sword")
-            {
-                //Bleeding
-            }
-            else if (player.weapon.name == "Needle")
-            {
-                //Poison
-            }
-            else if (player.weapon.name == "Long Stick")
-            {
-                //Blunt, no extra damage
-            }
-            else
-            {
-                //unarmed
-            }
-            return;
-        }
         void proceed()
         {
             Console.WriteLine("Press any key to proceed.");
@@ -216,14 +356,14 @@ namespace HelloDungeon
             Console.Clear();
         }
 
-        //   void lvlUP(string character)
-
-
-        //game functions
-
-        void printStats(Character print)
+        void printStats(ref Character print)
         {
-            Console.WriteLine("Name: " + print.name + "       Health: " + print.health + "\nStrength: " + print.strength + "     Dexterity: " + print.dexterity);
+            Console.WriteLine("Name: " + print.name + "       Class: " + className + "\nHealth: " + print.health + "\nStrength: " + print.strength + "\nDexterity: " + print.dexterity);
+        }
+
+        void printStats(ref Character printPlayer, ref Character printEnemy)
+        {
+            Console.WriteLine("Name: " + printPlayer.name + "      Class: " + className + "              Enemy: " + printEnemy.name + "       Health: " + printEnemy.health + "\nHealth: " + printPlayer.health + "\nStrength: " + printPlayer.strength + "\nDexterity: " + printPlayer.dexterity);
         }
 
         void heal(ref Character op, float health)
