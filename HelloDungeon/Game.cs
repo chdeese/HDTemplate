@@ -18,14 +18,19 @@ namespace HelloDungeon
             public float strength;
             public float baseDamage;
             public float dexterity;
-            public Weapon equippedWeapon;
+            public Weapon weapon;
         }
         struct Weapon
         {
             public string name;
             public float damage;
-            public string effectName;
-            public int effectDamage;
+            public Skill effect;
+        }
+        struct Skill
+        {
+            public string name;
+            public int damage;
+            public int duration;
         }
         bool gameOver;
         bool playerAlive;
@@ -36,24 +41,101 @@ namespace HelloDungeon
 
         //unfinished functions
 
-        void selectClass()
+        void assignStats(int selection)
         {
-            int selectedClass = 0;
-            player.name = getText("Enter player name");
-            while (selectedClass == 0)
+            if(selection == 1) //basketball player
             {
-                selectedClass = getInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
+                Console.WriteLine("You picked Basketball Player");
+                player.health = 50;
+                player.strength = 0.5f;
+                player.dexterity = 2;
+                
+            }
+            else if(selection == 2) //businessman
+            {
+                Console.WriteLine("You picked Businessman");
+                player.health = 30;
+                player.strength = 0;
+                player.dexterity = 0;
+            }
+            else //selection 3 //hobo
+            {
+                Console.WriteLine("You picked Hobo");
+                player.health = 20;
+                player.strength = 0;
+                player.dexterity = 1;
+            }
+            player.baseDamage = 2;
+        }
 
-
-                //give class with selectClass function
+        void characterCreation()
+        {
+            bool selectedClass = false;
+            player.name = getText("Enter player name");
+            while (!selectedClass)
+            {
+                assignStats(getInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", ""));
 
                 printStats(player);
 
                 //have a starting weapon and choose to drop it
 
+
+
             }
-            //change stats here with if
-            return;
+            //change 
+        }
+
+        void getWeapon(ref Character equipee, int selection)
+        {
+            if(selection == -1)
+            {
+                equipee.weapon.name = "Ball";
+                equipee.weapon.damage = 2;
+                equipee.weapon.effect.name = "Blunt";
+                equipee.weapon.effect.damage = 0;
+                equipee.weapon.effect.duration = 0;
+            }
+            else if(selection == -2)
+            {
+                equipee.weapon.name = "Briefcase";
+                equipee.weapon.damage = 4;
+                equipee.weapon.effect.name = "Blunt";
+                equipee.weapon.effect.damage = 0;
+                equipee.weapon.effect.duration = 0;
+            }
+            else if(selection == -3)
+            {
+                equipee.weapon.name = "Unarmed";
+                equipee.weapon.damage = 2;
+                equipee.weapon.effect.name = "Blunt";
+                equipee.weapon.effect.damage = 0;
+                equipee.weapon.effect.duration = 0;
+            }
+            else if(selection == 1)
+            {
+                equipee.weapon.name = "Sword";
+                equipee.weapon.damage = 5;
+                equipee.weapon.effect.name = "Bleeding";
+                equipee.weapon.effect.damage = 3;
+                equipee.weapon.effect.duration = 3;
+            }
+            else if(selection == 2)
+            {
+                equipee.weapon.name = "Needle";
+                equipee.weapon.damage = 3;
+                equipee.weapon.effect.name = "Poison";
+                equipee.weapon.effect.damage = 2;
+                equipee.weapon.effect.duration = 5;
+            }
+            else //selection 3
+            {
+                equipee.weapon.name = "Long Stick";
+                equipee.weapon.damage = 6;
+                equipee.weapon.effect.name = "Finesse";
+                equipee.weapon.effect.damage = 0;
+                equipee.weapon.effect.duration = 0;
+            }
         }
 
         void Stage(int stageNumber)
@@ -61,17 +143,17 @@ namespace HelloDungeon
             if (stageNumber == 1)
             {
                 createEnemy("ghoul");
-                Battle(ref enemy);
+                Battle();
             }
             else if (stageNumber == 2)
             {
                 createEnemy("bear");
-                Battle(ref enemy);
+                Battle();
             }
             else if (stageNumber == 3)
             {
                 createEnemy("dragon");
-                Battle(ref enemy);
+                Battle();
             }
             else
             {
@@ -80,28 +162,44 @@ namespace HelloDungeon
 
         }
 
-        Character quickAttack(Character initiator, ref Character receiver)
+        void quickAttack(Character initiator, ref Character receiver)
         {
             receiver.health -= initiator.baseDamage * (initiator.strength + 1);
-            return receiver;
         }
 
-        void Battle(ref Character enemy)
+        void Battle()
         {
             printStats(player);
+
+            if(player.health <= 0 || enemy.health <= 0)
+            {
+                WinResult();
+            }
         }
 
+        void WinResult()
+        {
+            if(player.health > 0 && enemy.health <= 0)
+            {
+                Console.WriteLine("VICTORY!");
+            }
+            else if(player.health <= 0 && enemy.health > 0)
+            {
+                Console.WriteLine("DEFEAT.");
+                playerAlive = false;
+            }
+        }
         void weaponDamage()
         {
-            if (player.equippedWeapon == "Sword")
+            if (player.weapon.name == "Sword")
             {
                 //Bleeding
             }
-            else if (player.equippedWeapon == "Needle")
+            else if (player.weapon.name == "Needle")
             {
                 //Poison
             }
-            else if (player.equippedWeapon == "Long Stick")
+            else if (player.weapon.name == "Long Stick")
             {
                 //Blunt, no extra damage
             }
@@ -163,10 +261,6 @@ namespace HelloDungeon
                     userInput = "";
                     Console.ReadKey(true);
                     continue;
-                }
-                else
-                {
-                    //do nothing
                 }
                 else if (userInput == "1")
                 {
@@ -306,7 +400,7 @@ namespace HelloDungeon
             playerAlive = true;
             stageNumber = 1;
 
-            selectClass();
+            characterCreation();
         }
 
 
