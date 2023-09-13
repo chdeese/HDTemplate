@@ -62,7 +62,18 @@ namespace HelloDungeon
                 Console.Write("> ");
 
                 userInput = Console.ReadLine();
-                if(userInput == "1")
+                if(userInput != "1" && userInput != "2" && !(userInput == "3" && option3 != "") && !(userInput == "4" && option4 != "") && !(userInput == "5" && option5 != ""))
+                {
+                    Console.WriteLine("Invalid Input, to try again, press any key.");
+                    userInput = "";
+                    Console.ReadKey(true);
+                    continue;
+                }
+                else
+                {
+                    //do nothing
+                }
+                else if(userInput == "1")
                 {
                     result = 1;
                 }
@@ -100,19 +111,19 @@ namespace HelloDungeon
 
         void selectClass(ref Character player)
         {
-            string selectedClass = "";
-            while(selectedClass == "")
+            int selectedClass = 0;
+            while(selectedClass == 0)
             {
-                //selectedClass = getInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
+                selectedClass = getInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
+
+
+                //give class with selectClass function
+
                 printStats(player);
+
             }
             //change stats here with if
-
-        }
-
-        void selectClass(ref Character badguy)
-        {
-            
+            return;
         }
 
         string getText(string prompt)
@@ -162,10 +173,14 @@ namespace HelloDungeon
             }
             else if (badguy.name == "Dragon")
             {
-
+                badguy.health = 200;
+                badguy.strength = 10;
+                badguy.baseDamage = 10;
+                badguy.dexterity = 5;
             }
             else
             {
+                Console.WriteLine("Error, failed enemy creation!");
                 //self destruct
             }
             return;
@@ -213,7 +228,7 @@ namespace HelloDungeon
 
         public void Run()
         {
-            Character player = selectClass();
+            Character player = selectClass(player);
             player.name = getText("Enter player name");
             player.health = 0;
             heal(player, 50);
