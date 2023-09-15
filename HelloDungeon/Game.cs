@@ -34,6 +34,13 @@ namespace HelloDungeon
             public float damage;
             public float duration;
         }
+
+        struct Item
+        {
+            public string name;
+            public Effect apply;
+        }
+
         bool gameOver;
         bool playerAlive;
         int stageNumber;
@@ -42,9 +49,242 @@ namespace HelloDungeon
         Character enemy;
 
         Character[] chars = new Character[4];
+        Item[] items = new Item[2];
 
 
         //unfinished functions
+
+        void getItem()
+        {
+             
+        }
+       
+
+
+        //actions
+
+        float quickAttack(Character initiator, ref Character receiver)
+        {
+            if (chance(ref receiver, -3))
+            {
+                float damage = (initiator.weapon.damage) * (initiator.dexterity + 1);
+
+                //chance to add ailment
+                if (initiator.weapon.effect.damage > 0 && chance(ref receiver, 2))
+                {
+                    receiver.ailment = initiator.weapon.effect;
+                }
+                return damage;
+            }
+            else
+            {
+                Console.WriteLine("You missed!!");
+            }
+            return 0;
+        }
+
+        float strongAttack(Character initiator, ref Character receiver)
+        {
+            if (chance(ref receiver, 2))
+            {
+                float damage = (initiator.weapon.damage + initiator.baseDamage) * (initiator.strength + 1);
+                
+                //chance to add ailment
+                if (initiator.weapon.effect.duration > 0 && chance(ref receiver, 5))
+                {
+                    receiver.ailment = initiator.weapon.effect;
+                }
+                return damage;
+            }
+            else
+            {
+                Console.WriteLine("You missed!!");
+            }
+            return 0;
+        }
+
+        //requires an invincible bool inside of the calling function to check if dodge was successful
+        bool dodge(Character initiator, ref Character receiver)
+        {
+
+            //if dodge is successful, pass a true bool to the invincible bool 
+            if(chance(ref receiver, 2))
+            {
+                return true;
+            }
+            return false;
+        }        
+        bool shield(Character initiator, ref Character receiver)
+        {
+            if(chance(ref receiver, 2))
+            {
+                Console.WriteLine(initiator.name + " successfully blocked!! Only took half damage!");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(initiator.name + " failed to block!!");
+            }
+            return false;
+        }
+
+        
+        //battle functions
+
+        void Battle()
+        {
+            while (player.health > 0 && enemy.health > 0)
+            {
+                printStats(ref player);
+
+                int playerChoice = getInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
+                int enemyDecision = enemyChoice();
+                float playerDamageDone = 0;
+                float enemyDamageDone = 0;
+
+                if (playerChoice == 1)
+                {
+                    if (enemyDecision == 1)
+                    {
+                        playerDamageDone = strongAttack(player, ref enemy);
+                        enemyDamageDone = strongAttack(enemy, ref player);
+                    }
+                    else if (enemyDecision == 2)
+                    {
+                        enemyDamageDone = quickAttack(enemy, ref player);
+                    }
+                    else if (enemyDecision == 3)
+                    {
+                        if(shield(enemy, ref player))
+                        {
+                            playerDamageDone = (strongAttack(player, ref enemy) / 2);
+                            Console.WriteLine(enemy.name + " blocked the attack!! They took " + playerDamageDone + " damage!");
+                        }
+                        else
+                        {
+                            playerDamageDone = strongAttack(player, ref enemy);
+                            Console.WriteLine(enemy.name + " failed to block the attack!! They took " + playerDamageDone + " damage!");
+                        }
+                    }
+                }
+                else if(playerChoice == 2)
+                {
+                    if (enemyDecision == 1)
+                    {
+                        playerDamageDone = quickAttack(player, ref enemy);
+                        Console.WriteLine(player.name + " hit " + enemy.name + " for " + playerDamageDone + " damage!!");
+                    }
+                    else if (enemyDecision == 2)
+                    {
+                        enemyDamageDone = quickAttack(enemy, ref player);
+                        Console.WriteLine(enemy.name + " hit " + player.name + " first for " + enemyDamageDone + " damage!!");
+                    }
+                    else if (enemyDecision == 3)
+                    {
+                        if (shield(enemy, ref player))
+                        {
+                            playerDamageDone = quickAttack(player, ref enemy) / 2;
+                            Console.WriteLine(enemy.name + " blocked " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                        }
+                        else
+                        {
+                            playerDamageDone = quickAttack(player, ref enemy);
+                            Console.WriteLine(enemy.name + " failed to block " + player.name + "'s attack! The took " + playerDamageDone + " damage!");
+                        }
+                    }
+                }
+                else if(playerChoice == 3)
+                {
+                    if (enemyDecision == 1)
+                    {
+                        if(shield(player, ref enemy))
+                        {
+                            enemyDamageDone = strongAttack(enemy, ref player) / 2;
+                        }
+                        else
+                        {
+                            enemyDamageDone = strongAttack(enemy, ref player);
+                        }
+                    }
+                    else if (enemyDecision == 2)
+                    {
+                        if(shield(enemy, ref player))
+                        {
+                            Console.WriteLine(player.name + " blocked " + enemy.name + "'s attack!");
+                        }
+                        else
+                        {
+                            enemyDamageDone = quickAttack(enemy, ref player);
+                            Console.WriteLine(player.name + "'s block failed!! " + enemy.name + " hit " + player.name + " for " + enemyDamageDone + "damage!");
+                        }
+                    }
+                    else 
+                    {
+                       Console.WriteLine("You both take defensive positions but nothing happens.");
+                    }
+                }
+                else if(playerChoice == 4)
+                {
+                    if (enemyDecision == 3 || enemyDecision == 4)
+                    {
+                        Console.WriteLine("You both take defensive positions but nothing happens.");
+                    }
+                    else
+                    {
+                        if (dodge(player, ref enemy))
+                        {
+                            Console.WriteLine(player.name + " was able to evade " + enemy.name + "'s attack!!");
+                        }
+                        else if(enemyDecision == 1)
+                        {
+                            enemyDamageDone = strongAttack(enemy, ref player);
+                            Console.WriteLine(player.name + " failed to dodge " + enemy.name + "'s attack!! " + player.name + " took " + enemyDamageDone + " damage!");
+                        }
+                        else
+                        {
+                            enemyDamageDone = quickAttack(enemy, ref player);
+                            Console.WriteLine(player.name + " failed to dodge " + enemy.name + "'s attack!! " + player.name + " took " + enemyDamageDone + " damage!");
+                        }
+                    }
+                }
+                else
+                {
+                    getItem(player);
+                }
+                //then do enemy move (own function)
+                enemy.health -= playerDamageDone;
+                player.health -= enemyDamageDone;
+                bonusDamage();
+            }
+            WinResult();
+        }
+
+        void WinResult()
+        {
+            if(player.health > 0 && enemy.health <= 0)
+            {
+                Console.WriteLine("VICTORY!");
+            }
+            else if(player.health <= 0 && enemy.health > 0)
+            {
+                Console.WriteLine("DEFEAT.");
+                playerAlive = false;
+            }
+        }
+        void bonusDamage()
+        {
+            if (player.ailment.duration != 0)
+            {
+                Console.WriteLine(player.name + " took " + player.ailment.damage + " from " + player.ailment.name + "!!");
+                player.health -= player.ailment.damage;
+                player.ailment.duration--;
+            }
+            if (enemy.ailment.duration != 0)
+            {
+                Console.WriteLine("The " + enemy.name + " took " + enemy.ailment.damage + " from " + enemy.ailment.name + "!!");
+            }
+        }
+
         int enemyChoice()
         {
             if(chance(ref player, -3) && (enemy.health > (enemy.health /= 2)))
@@ -77,132 +317,6 @@ namespace HelloDungeon
                 }
             }
         }
-
-
-
-        void shield(Character initiator, ref Character receiver)
-        {
-            
-        }
-
-        //actions
-
-        void quickAttack(Character initiator, ref Character receiver)
-        {
-            if (chance(ref receiver, -3))
-            {
-                float damage = (initiator.weapon.damage) * (initiator.dexterity + 1);
-                Console.WriteLine(initiator.name + " hit " + receiver.name + " for " + damage + " damage!!");
-                receiver.health -= damage;
-
-                //chance to add ailment
-                if (initiator.weapon.effect.damage > 0 && chance(ref receiver, 2))
-                {
-                    receiver.ailment = initiator.weapon.effect;
-                }
-            }
-            else
-            {
-                Console.WriteLine("You missed!!");
-            }
-        }
-
-        void strongAttack(Character initiator, ref Character receiver)
-        {
-            if (chance(ref receiver, 2))
-            {
-                float damage = (initiator.weapon.damage + initiator.baseDamage) * (initiator.strength + 1);
-                Console.WriteLine(initiator.name + " hit " + receiver.name + " for " + damage + " damage!!");
-                receiver.health -= damage;
-
-                //chance to add ailment
-                if (initiator.weapon.effect.duration > 0 && chance(ref receiver, 5))
-                {
-                    receiver.ailment = initiator.weapon.effect;
-                }
-            }
-            else
-            {
-                Console.WriteLine("You missed!!");
-            }
-        }
-
-        //requires an invincible bool inside of the calling function to check if dodge was successful
-        bool dodge(Character initiator, ref Character receiver)
-        {
-
-            //if dodge is successful, pass a true bool to the invincible bool 
-            if(chance(ref receiver, 2))
-            {
-                Console.WriteLine(initiator.name + " dodged the attack!!");
-                return true;
-            }
-            return false;
-        }        
-
-        //battle functions
-
-        void Battle()
-        {
-            while (player.health > 0 && enemy.health > 0)
-            {
-                printStats(ref player);
-
-                int playerChoice = getInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
-
-                if (playerChoice == 1)
-                {
-                    strongAttack(player, ref enemy);
-                }
-                else if(playerChoice == 2)
-                {
-                    quickAttack(player, ref enemy);
-                }
-                else if(playerChoice == 3)
-                {
-                    shield(player, ref enemy);
-                }
-                else if(playerChoice == 4)
-                {
-                    dodge(player, ref enemy);
-                }
-                else
-                {
-                    getItem(player);
-                }
-                //then do enemy move (own function)
-
-                bonusDamage();
-            }
-            WinResult();
-        }
-
-        void WinResult()
-        {
-            if(player.health > 0 && enemy.health <= 0)
-            {
-                Console.WriteLine("VICTORY!");
-            }
-            else if(player.health <= 0 && enemy.health > 0)
-            {
-                Console.WriteLine("DEFEAT.");
-                playerAlive = false;
-            }
-        }
-        void bonusDamage()
-        {
-            if (player.ailment.duration != 0)
-            {
-                Console.WriteLine(player.name + " took " + player.ailment.damage + " from " + player.ailment.name + "!!");
-                player.health -= player.ailment.damage;
-                player.ailment.duration--;
-            }
-            if (enemy.ailment.duration != 0)
-            {
-                Console.WriteLine("The " + enemy.name + " took " + enemy.ailment.damage + " from " + enemy.ailment.name + "!!");
-            }
-        }
-
 
         //   void lvlUP(string character)
 
