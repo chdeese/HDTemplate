@@ -45,19 +45,44 @@ namespace HelloDungeon
 
 
         //unfinished functions
-        void enemyChoice()
+        int enemyChoice()
         {
-
+            if(chance(ref player, -3) && (enemy.health > (enemy.health /= 2)))
+            {
+                return 1;
+            }
+            else
+            {
+                if(chance(ref player, 3) && enemy.health <= (enemy.health /= 2))
+                {
+                    return 1;
+                }
+                else
+                {
+                    if(chance(ref player, -3))
+                    {
+                        return 2;
+                    }
+                    else
+                    {
+                        if(chance(ref player, 2))
+                        {
+                            return 3;
+                        }
+                        else
+                        {
+                            return 4;
+                        }
+                    }
+                }
+            }
         }
 
-        void block(Character initiator, ref Character receiver)
-        {
 
-        }
 
         void shield(Character initiator, ref Character receiver)
         {
-
+            
         }
 
         //actions
@@ -102,7 +127,18 @@ namespace HelloDungeon
             }
         }
 
-        
+        //requires an invincible bool inside of the calling function to check if dodge was successful
+        bool dodge(Character initiator, ref Character receiver)
+        {
+
+            //if dodge is successful, pass a true bool to the invincible bool 
+            if(chance(ref receiver, 2))
+            {
+                Console.WriteLine(initiator.name + " dodged the attack!!");
+                return true;
+            }
+            return false;
+        }        
 
         //battle functions
 
