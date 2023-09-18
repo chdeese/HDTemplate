@@ -42,13 +42,13 @@ namespace HelloDungeon
         }
 
         bool gameOver;
+        bool restart;
         bool playerAlive;
         int stageNumber;
         string className = "";
         Character player;
         Character enemy;
-
-        Character[] chars = new Character[4];
+        Character[] enemies = new Character[3];
         Item[] items = new Item[5];
         Item[] playerInv = new Item[2];
 
@@ -100,7 +100,7 @@ namespace HelloDungeon
         }
 
         //requires an invincible bool inside of the calling function to check if dodge was successful
-        bool dodge(Character initiator, ref Character receiver)
+        bool dodge(ref Character receiver)
         {
 
             //if dodge is successful, pass a true bool to the invincible bool 
@@ -186,13 +186,14 @@ namespace HelloDungeon
             }
         }
 
+
         //battle functions
 
         void Battle()
         {
             while (player.health > 0 && enemy.health > 0)
             {
-                printStats(ref player);
+                printStats(ref player, ref enemy);
 
                 int playerChoice = getInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
                 int enemyDecision = enemyChoice();
@@ -229,24 +230,38 @@ namespace HelloDungeon
                     if (enemyDecision == 1)
                     {
                         playerDamageDone = quickAttack(player, ref enemy);
-                        Console.WriteLine(player.name + " hit " + enemy.name + " for " + playerDamageDone + " damage!!");
+                        if (playerDamageDone > 0)
+                        {
+                            Console.WriteLine(player.name + " hit " + enemy.name + " for " + playerDamageDone + " damage!!");
+                        }
                     }
                     else if (enemyDecision == 2)
                     {
                         enemyDamageDone = quickAttack(enemy, ref player);
-                        Console.WriteLine(enemy.name + " hit " + player.name + " first for " + enemyDamageDone + " damage!!");
+                        if (enemyDamageDone > 0)
+                        {
+                            Console.WriteLine(enemy.name + " hit " + player.name + " first for " + enemyDamageDone + " damage!!");
+                        }
+                    
                     }
                     else if (enemyDecision == 3)
                     {
                         if (shield(enemy, ref player))
                         {
+
                             playerDamageDone = quickAttack(player, ref enemy) / 2;
-                            Console.WriteLine(enemy.name + " blocked " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                            if (playerDamageDone > 0)
+                            {
+                                Console.WriteLine(enemy.name + " blocked " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                            }
                         }
                         else
                         {
                             playerDamageDone = quickAttack(player, ref enemy);
-                            Console.WriteLine(enemy.name + " failed to block " + player.name + "'s attack! The took " + playerDamageDone + " damage!");
+                            if (playerDamageDone > 0)
+                            {
+                                Console.WriteLine(enemy.name + " failed to block " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                            }
                         }
                     }
                 }
@@ -257,10 +272,13 @@ namespace HelloDungeon
                         if (shield(player, ref enemy))
                         {
                             enemyDamageDone = strongAttack(enemy, ref player) / 2;
+
+                            Console.WriteLine(player.name + " blocked " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
                         }
                         else
                         {
                             enemyDamageDone = strongAttack(enemy, ref player);
+                            Console.WriteLine(player.name + " failed to block " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
                         }
                     }
                     else if (enemyDecision == 2)
@@ -288,7 +306,7 @@ namespace HelloDungeon
                     }
                     else
                     {
-                        if (dodge(player, ref enemy))
+                        if (dodge(ref enemy))
                         {
                             Console.WriteLine(player.name + " was able to evade " + enemy.name + "'s attack!!");
                         }
@@ -537,17 +555,17 @@ namespace HelloDungeon
         {
             if (stageNumber == 1)
             {
-                createEnemy("ghoul");
+                enemy = enemies[0];
                 Battle();
             }
             else if (stageNumber == 2)
             {
-                createEnemy("bear");
+                enemy = enemies[1];
                 Battle();
             }
             else if (stageNumber == 3)
             {
-                createEnemy("dragon");
+                enemy = enemies[2];
                 Battle();
             }
             else
@@ -572,25 +590,25 @@ namespace HelloDungeon
             op.health += health;
         }
 
-        void createEnemies(ref Character[] per)
+        void createEnemies(ref Character[] enemy)
         {
-            per[1].name = "Ghoul";
-            per[1].health = 30;
-            per[1].strength = 1;
-            per[1].baseDamage = 5;
-            per[1].dexterity = 0.5f;
+            enemy[0].name = "Ghoul";
+            enemy[0].health = 30;
+            enemy[0].strength = 1;
+            enemy[0].baseDamage = 5;
+            enemy[0].dexterity = 0.5f;
 
-            per[2].name = "Bear";
-            per[2].health = 75;
-            per[2].strength = 4;
-            per[2].baseDamage = 4;
-            per[2].dexterity = 3;
+            enemy[1].name = "Bear";
+            enemy[1].health = 75;
+            enemy[1].strength = 4;
+            enemy[1].baseDamage = 4;
+            enemy[1].dexterity = 3;
 
-            per[3].name = "Dragon";
-            per[3].health = 200;
-            per[3].strength = 10;
-            per[3].baseDamage = 10;
-            per[3].dexterity = 5;
+            enemy[2].name = "Dragon";
+            enemy[2].health = 200;
+            enemy[2].strength = 10;
+            enemy[2].baseDamage = 10;
+            enemy[2].dexterity = 5;
         }
 
         void addToInventory(Item item)
@@ -627,7 +645,6 @@ namespace HelloDungeon
             }
 
         }
-
 
 
 
@@ -738,31 +755,16 @@ namespace HelloDungeon
 
         bool quitGame()
         {
-            int response;
-            if (playerAlive == false)
-            {
-                response = getInput("Do you want to play again?", "Restart", "Quit Game", "", "", "");
-                response++;
-            }
-            else
-            {
-                response = getInput("Do you want to continue?", "Continue", "Restart", "Quit Game", "", "");
-            }
+            int response = 0;
+            response = getInput("Do you want to play again?", "Yes", "No", "", "", "");
 
-            if (response == 1)
+            if (response == 2)
             {
-                return false;
+                restart = false;
             }
-            else if (response == 2)
-            {
-                playerAlive = false;
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return true;
         }
+
 
 
         //start - called before the first loop and initalizes variables
@@ -773,6 +775,7 @@ namespace HelloDungeon
             stageNumber = 1;
 
             characterCreation();
+            createEnemies(ref enemies);
         }
 
         //update - called every time the game loops, like player input, character postions, game logic
@@ -784,9 +787,11 @@ namespace HelloDungeon
                 if (!playerAlive)
                 {
                     Console.WriteLine("You Died!");
-                    gameOver = quitGame();
+                    gameOver = true;
+                    stageNumber = 1;
                     continue;
                 }
+                playerAlive = true;
                 Stage(stageNumber);
                 proceed();
             }
@@ -799,29 +804,16 @@ namespace HelloDungeon
             Console.WriteLine("Thanks for playing!");
         }
 
-        int addTogether(int[] array)
-        {
-            int sum = 0;
-            for (int i = 0; i < array.Length; i++)
-            {
-
-                sum += array[i];
-            }
-            Console.WriteLine(sum);
-            return sum;
-        }
-
-
         public void Run()
         {
-
-            int[] bunchaNums = new int[4] { 1, 25, 3, 99 };
-            Console.WriteLine(addTogether(bunchaNums));
-
-            Start();
-            while (!gameOver)
+            restart = true;
+            while (restart)
             {
-                Update();
+                Start();
+                while (!gameOver)
+                {
+                    Update();
+                }
             }
             End();
         }
