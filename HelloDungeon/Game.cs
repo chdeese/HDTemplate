@@ -114,7 +114,6 @@ namespace HelloDungeon
         {
             if (chance(ref receiver, 2))
             {
-                Console.WriteLine(initiator.name + " successfully blocked!! Only took half damage!");
                 return true;
             }
             else
@@ -193,7 +192,7 @@ namespace HelloDungeon
         {
             while (player.health > 0 && enemy.health > 0)
             {
-                printStats(ref player, ref enemy);
+                printStats(player, enemy);
 
                 int playerChoice = getInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
                 int enemyDecision = enemyChoice();
@@ -326,7 +325,7 @@ namespace HelloDungeon
                 {
                     useItem();
                 }
-                //then do enemy move (own function)
+                //then do damage
                 enemy.health -= playerDamageDone;
                 player.health -= enemyDamageDone;
                 bonusDamage();
@@ -338,11 +337,15 @@ namespace HelloDungeon
         {
             if (player.health > 0 && enemy.health <= 0)
             {
+                Console.Clear();
                 Console.WriteLine("VICTORY!");
+                Console.WriteLine(player.health + " health left...");
             }
             else if (player.health <= 0 && enemy.health > 0)
             {
+                Console.Clear();
                 Console.WriteLine("DEFEAT.");
+                Console.WriteLine(enemy.name + " has " + enemy.health + " health remaining");
                 playerAlive = false;
             }
         }
@@ -363,13 +366,14 @@ namespace HelloDungeon
 
         int enemyChoice()
         {
-            if (chance(ref player, -3) && (enemy.health > (enemy.health /= 2)))
+            float halfHealthAmount = enemy.health / 2;
+            if (chance(ref player, -3) && (enemy.health > halfHealthAmount))
             {
                 return 1;
             }
             else
             {
-                if (chance(ref player, 3) && enemy.health <= (enemy.health /= 2))
+                if (chance(ref player, 3) && enemy.health <= halfHealthAmount)
                 {
                     return 1;
                 }
@@ -408,35 +412,35 @@ namespace HelloDungeon
             }
             else if (mod == 2)
             {
-                if ((enemy.health %= 2) == 0)
+                if ((enemy.health % 2) == 0)
                 {
                     return true;
                 }
             }
             else if (mod == 3)
             {
-                if ((enemy.health %= 3) == 0)
+                if ((enemy.health % 3) == 0)
                 {
                     return true;
                 }
             }
             else if (mod == 5)
             {
-                if ((enemy.health %= 5) == 0)
+                if ((enemy.health % 5) == 0)
                 {
                     return true;
                 }
             }
             else if (mod == -3)
             {
-                if ((enemy.health %= 3) != 0)
+                if ((enemy.health % 3) != 0)
                 {
                     return true;
                 }
             }
             else // -5
             {
-                if ((enemy.health %= 5) != 0)
+                if ((enemy.health % 5) != 0)
                 {
                     return true;
                 }
@@ -474,7 +478,7 @@ namespace HelloDungeon
                 className = "Hobo";
                 getWeapon(ref player, -3);
             }
-            player.baseDamage = 2;
+            player.baseDamage = 1;
         }
 
         void characterCreation()
@@ -490,7 +494,7 @@ namespace HelloDungeon
                 Console.Clear();
                 proceed();
 
-                printStats(ref player);
+                printStats(player);
 
                 if (getInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
                 {
@@ -504,7 +508,7 @@ namespace HelloDungeon
             if (selection == -1)
             {
                 equipee.weapon.name = "Ball";
-                equipee.weapon.damage = 2;
+                equipee.weapon.damage = 1;
                 equipee.weapon.effect.name = "Blunt";
                 equipee.weapon.effect.damage = 0;
                 equipee.weapon.effect.duration = 0;
@@ -512,7 +516,7 @@ namespace HelloDungeon
             else if (selection == -2)
             {
                 equipee.weapon.name = "Briefcase";
-                equipee.weapon.damage = 4;
+                equipee.weapon.damage = 2;
                 equipee.weapon.effect.name = "Blunt";
                 equipee.weapon.effect.damage = 0;
                 equipee.weapon.effect.duration = 0;
@@ -520,7 +524,7 @@ namespace HelloDungeon
             else if (selection == -3)
             {
                 equipee.weapon.name = "Unarmed";
-                equipee.weapon.damage = 2;
+                equipee.weapon.damage = 0.5f;
                 equipee.weapon.effect.name = "Blunt";
                 equipee.weapon.effect.damage = 0;
                 equipee.weapon.effect.duration = 0;
@@ -528,17 +532,17 @@ namespace HelloDungeon
             else if (selection == 1)
             {
                 equipee.weapon.name = "Sword";
-                equipee.weapon.damage = 5;
+                equipee.weapon.damage = 1.5f;
                 equipee.weapon.effect.name = "Bleeding";
-                equipee.weapon.effect.damage = 3;
+                equipee.weapon.effect.damage = 1.5f;
                 equipee.weapon.effect.duration = 3;
             }
             else if (selection == 2)
             {
                 equipee.weapon.name = "Needle";
-                equipee.weapon.damage = 3;
+                equipee.weapon.damage = 0.4f;
                 equipee.weapon.effect.name = "Poison";
-                equipee.weapon.effect.damage = 2;
+                equipee.weapon.effect.damage = 1;
                 equipee.weapon.effect.duration = 5;
             }
             else //selection 3
@@ -575,12 +579,12 @@ namespace HelloDungeon
 
         }
 
-        void printStats(ref Character print)
+        void printStats(Character print)
         {
             Console.WriteLine("Name: " + print.name + "       Class: " + className + "\nHealth: " + print.health + "\nStrength: " + print.strength + "\nDexterity: " + print.dexterity);
         }
 
-        void printStats(ref Character printPlayer, ref Character printEnemy)
+        void printStats(Character printPlayer, Character printEnemy)
         {
             Console.WriteLine("Name: " + printPlayer.name + "      Class: " + className + "              Enemy: " + printEnemy.name + "       Health: " + printEnemy.health + "\nHealth: " + printPlayer.health + "\nStrength: " + printPlayer.strength + "\nDexterity: " + printPlayer.dexterity);
         }
@@ -595,7 +599,7 @@ namespace HelloDungeon
             enemy[0].name = "Ghoul";
             enemy[0].health = 30;
             enemy[0].strength = 1;
-            enemy[0].baseDamage = 5;
+            enemy[0].baseDamage = 3;
             enemy[0].dexterity = 0.5f;
 
             enemy[1].name = "Bear";
@@ -793,6 +797,7 @@ namespace HelloDungeon
                 }
                 playerAlive = true;
                 Stage(stageNumber);
+                stageNumber++;
                 proceed();
             }
         }
