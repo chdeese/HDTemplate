@@ -18,7 +18,7 @@ namespace HelloDungeon
         bool playerAlive;
         int stageNumber;
         string className = "";
-        Character player;
+        Player PlayerCharacter;
         Character enemy;
         Character[] enemies = new Character[3];
         Item[] items = new Item[5];
@@ -29,9 +29,9 @@ namespace HelloDungeon
         //battle functions
         void Battle()
         {
-            while (player.GetHealth() > 0 && enemy.GetHealth() > 0)
+            while (PlayerCharacter.GetHealth() > 0 && enemy.GetHealth() > 0)
             {
-                player.PrintBattleStats(enemy);
+                PlayerCharacter.PrintBattleStats(enemy);
                 
                 //prints enemy's move and gives player a chance to react appropriately
                 int enemyDecision = EnemyChoice();
@@ -45,23 +45,23 @@ namespace HelloDungeon
                 {
                     if (enemyDecision == 1)
                     {
-                        playerDamageDone = strongAttack(player, ref enemy);
-                        enemyDamageDone = strongAttack(enemy, ref player);
+                        playerDamageDone = strongAttack(PlayerCharacter, ref enemy);
+                        enemyDamageDone = strongAttack(enemy, ref PlayerCharacter);
                     }
                     else if (enemyDecision == 2)
                     {
-                        enemyDamageDone = quickAttack(enemy, ref player);
+                        enemyDamageDone = quickAttack(enemy, ref PlayerCharacter);
                     }
                     else if (enemyDecision == 3)
                     {
-                        if (shield(enemy, ref player))
+                        if (shield(enemy, ref PlayerCharacter))
                         {
-                            playerDamageDone = (strongAttack(player, ref enemy) / 2);
+                            playerDamageDone = (strongAttack(PlayerCharacter, ref enemy) / 2);
                             Console.WriteLine(enemy.name + " blocked the attack!! They took " + playerDamageDone + " damage!");
                         }
                         else
                         {
-                            playerDamageDone = strongAttack(player, ref enemy);
+                            playerDamageDone = strongAttack(PlayerCharacter, ref enemy);
                             Console.WriteLine(enemy.name + " failed to block the attack!! They took " + playerDamageDone + " damage!");
                         }
                     }
@@ -70,38 +70,38 @@ namespace HelloDungeon
                 {
                     if (enemyDecision == 1)
                     {
-                        playerDamageDone = quickAttack(player, ref enemy);
+                        playerDamageDone = quickAttack(PlayerCharacter, ref enemy);
                         if (playerDamageDone > 0)
                         {
-                            Console.WriteLine(player.name + " hit " + enemy.name + " for " + playerDamageDone + " damage!!");
+                            Console.WriteLine(PlayerCharacter.name + " hit " + enemy.name + " for " + playerDamageDone + " damage!!");
                         }
                     }
                     else if (enemyDecision == 2)
                     {
-                        enemyDamageDone = quickAttack(enemy, ref player);
+                        enemyDamageDone = quickAttack(enemy, ref PlayerCharacter);
                         if (enemyDamageDone > 0)
                         {
-                            Console.WriteLine(enemy.name + " hit " + player.name + " first for " + enemyDamageDone + " damage!!");
+                            Console.WriteLine(enemy.name + " hit " + PlayerCharacter.name + " first for " + enemyDamageDone + " damage!!");
                         }
                     
                     }
                     else if (enemyDecision == 3)
                     {
-                        if (shield(enemy, ref player))
+                        if (shield(enemy, ref PlayerCharacter))
                         {
 
-                            playerDamageDone = quickAttack(player, ref enemy) / 2;
+                            playerDamageDone = quickAttack(PlayerCharacter, ref enemy) / 2;
                             if (playerDamageDone > 0)
                             {
-                                Console.WriteLine(enemy.name + " blocked " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                                Console.WriteLine(enemy.name + " blocked " + PlayerCharacter.name + "'s attack! They took " + playerDamageDone + " damage!");
                             }
                         }
                         else
                         {
-                            playerDamageDone = quickAttack(player, ref enemy);
+                            playerDamageDone = quickAttack(PlayerCharacter, ref enemy);
                             if (playerDamageDone > 0)
                             {
-                                Console.WriteLine(enemy.name + " failed to block " + player.name + "'s attack! They took " + playerDamageDone + " damage!");
+                                Console.WriteLine(enemy.name + " failed to block " + PlayerCharacter.name + "'s attack! They took " + playerDamageDone + " damage!");
                             }
                         }
                     }
@@ -110,28 +110,28 @@ namespace HelloDungeon
                 {
                     if (enemyDecision == 1)
                     {
-                        if (shield(player, ref enemy))
+                        if (shield(PlayerCharacter, ref enemy))
                         {
-                            enemyDamageDone = strongAttack(enemy, ref player) / 2;
+                            enemyDamageDone = strongAttack(enemy, ref PlayerCharacter) / 2;
 
-                            Console.WriteLine(player.name + " blocked " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
+                            Console.WriteLine(PlayerCharacter.name + " blocked " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
                         }
                         else
                         {
-                            enemyDamageDone = strongAttack(enemy, ref player);
-                            Console.WriteLine(player.name + " failed to block " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
+                            enemyDamageDone = strongAttack(enemy, ref PlayerCharacter);
+                            Console.WriteLine(PlayerCharacter.name + " failed to block " + enemy.name + "'s attack! They took " + enemyDamageDone + " damage!");
                         }
                     }
                     else if (enemyDecision == 2)
                     {
-                        if (shield(enemy, ref player))
+                        if (shield(enemy, ref PlayerCharacter))
                         {
-                            Console.WriteLine(player.name + " blocked " + enemy.name + "'s attack!");
+                            Console.WriteLine(PlayerCharacter.name + " blocked " + enemy.name + "'s attack!");
                         }
                         else
                         {
-                            enemyDamageDone = quickAttack(enemy, ref player);
-                            Console.WriteLine(player.name + "'s block failed!! " + enemy.name + " hit " + player.name + " for " + enemyDamageDone + "damage!");
+                            enemyDamageDone = quickAttack(enemy, ref PlayerCharacter);
+                            Console.WriteLine(PlayerCharacter.name + "'s block failed!! " + enemy.name + " hit " + PlayerCharacter.name + " for " + enemyDamageDone + "damage!");
                         }
                     }
                     else
@@ -149,17 +149,17 @@ namespace HelloDungeon
                     {
                         if (dodge(ref enemy))
                         {
-                            Console.WriteLine(player.name + " was able to evade " + enemy.name + "'s attack!!");
+                            Console.WriteLine(PlayerCharacter.name + " was able to evade " + enemy.name + "'s attack!!");
                         }
                         else if (enemyDecision == 1)
                         {
-                            enemyDamageDone = strongAttack(enemy, ref player);
-                            Console.WriteLine(player.name + " failed to dodge " + enemy.name + "'s attack!! " + player.name + " took " + enemyDamageDone + " damage!");
+                            enemyDamageDone = strongAttack(enemy, ref PlayerCharacter);
+                            Console.WriteLine(PlayerCharacter.name + " failed to dodge " + enemy.name + "'s attack!! " + PlayerCharacter.name + " took " + enemyDamageDone + " damage!");
                         }
                         else
                         {
-                            enemyDamageDone = quickAttack(enemy, ref player);
-                            Console.WriteLine(player.name + " failed to dodge " + enemy.name + "'s attack!! " + player.name + " took " + enemyDamageDone + " damage!");
+                            enemyDamageDone = quickAttack(enemy, ref PlayerCharacter);
+                            Console.WriteLine(PlayerCharacter.name + " failed to dodge " + enemy.name + "'s attack!! " + PlayerCharacter.name + " took " + enemyDamageDone + " damage!");
                         }
                     }
                 }
@@ -169,7 +169,7 @@ namespace HelloDungeon
                 }
                 //then do damage
                 enemy.TakeDamage(playerDamageDone);
-                player.TakeDamage(enemyDamageDone);
+                PlayerCharacter.TakeDamage(enemyDamageDone);
                 BonusDamage();
             }
             WinResult();
@@ -177,13 +177,13 @@ namespace HelloDungeon
 
         void WinResult()
         {
-            if (player.GetHealth() > 0 && enemy.GetHealth() <= 0)
+            if (PlayerCharacter.GetHealth() > 0 && enemy.GetHealth() <= 0)
             {
                 Console.Clear();
                 Console.WriteLine("VICTORY!");
-                Console.WriteLine(player.GetHealth() + " health left...");
+                Console.WriteLine(PlayerCharacter.GetHealth() + " health left...");
             }
-            else if (player.GetHealth() <= 0 && enemy.GetHealth() > 0)
+            else if (PlayerCharacter.GetHealth() <= 0 && enemy.GetHealth() > 0)
             {
                 Console.Clear();
                 Console.WriteLine("DEFEAT.");
@@ -194,11 +194,11 @@ namespace HelloDungeon
 
         void BonusDamage()
         {
-            if (player.GetAilment().duration != 0)
+            if (PlayerCharacter.GetAilment().duration != 0)
             {
-                Console.WriteLine(player.name + " took " + player.ailment.damage + " from " + player.ailment.name + "!!");
-                player.health -= player.ailment.damage;
-                player.ailment.duration--;
+                Console.WriteLine(PlayerCharacter.name + " took " + PlayerCharacter.ailment.damage + " from " + PlayerCharacter.ailment.name + "!!");
+                PlayerCharacter.health -= PlayerCharacter.ailment.damage;
+                PlayerCharacter.ailment.duration--;
             }
             if (enemy.GetAilment().duration != 0)
             {
@@ -209,27 +209,27 @@ namespace HelloDungeon
         int EnemyChoice()
         {
             float halfHealthAmount = enemy.GetHealth() / 2;
-            if (Chance(ref player, -3) && (enemy.GetHealth() > halfHealthAmount))
+            if (Chance(ref PlayerCharacter, -3) && (enemy.GetHealth() > halfHealthAmount))
             {
                 return 1;
             }
             else
             {
-                if (Chance(ref player, 3) && enemy.GetHealth() <= halfHealthAmount)
+                if (Chance(ref PlayerCharacter, 3) && enemy.GetHealth() <= halfHealthAmount)
                 {
                     Console.WriteLine("The " + enemy.GetName() + " is charging up an attack!!");
                     return 1;
                 }
                 else
                 {
-                    if (Chance(ref player, -3))
+                    if (Chance(ref PlayerCharacter, -3))
                     {
                         Console.WriteLine("The " + enemy.GetName() + " is attacking!!");
                         return 2;
                     }
                     else
                     {
-                        if (Chance(ref player, 2))
+                        if (Chance(ref PlayerCharacter, 2))
                         {
                             Console.WriteLine("The " + enemy.GetName() + " is preparing for you to strike!!");
                             return 3;
@@ -291,25 +291,25 @@ namespace HelloDungeon
             return false;
         }
 
-        public void AssignStats(int selection)
+        void AssignStats(int selection)
         {
             if (selection == 1) //basketball player
             {
                 Console.WriteLine("You picked Basketball Player");
-                player = new Character("", 50, 0.5f, 1, 2, GetWeapon(-1), none);
+                PlayerCharacter = new Character("", 50, 0.5f, 1, 2, GetWeapon(-1), none);
                 className = "BasketBall Player";
 
             }
             else if (selection == 2) //businessman
             {
                 Console.WriteLine("You picked Businessman");
-                player = new Character("", 30, 0, 1, 0, GetWeapon(-2), none);
+                PlayerCharacter = new Character("", 30, 0, 1, 0, GetWeapon(-2), none);
                 className = "Businessman";
             }
             else //selection 3 //hobo
             {
                 Console.WriteLine("You picked Hobo");
-                player = new Character("", 20, 0, 1, 1, GetWeapon(-3), none);
+                PlayerCharacter = new Character("", 20, 0, 1, 1, GetWeapon(-3), none);
                 className = "Hobo";
             }
         }
@@ -324,11 +324,11 @@ namespace HelloDungeon
 
                 //have a starting weapon and choose to drop it
 
-                player.SetName(GetText("Enter character name"));
+                PlayerCharacter.SetName(GetText("Enter character name"));
                 Console.Clear();
                 Proceed();
 
-                player.PrintStats();
+                PlayerCharacter.PrintStats();
 
                 if (GetInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
                 {
@@ -433,6 +433,7 @@ namespace HelloDungeon
 
             enemy[2] = new Character("Dragon", 200, 10, 10, 5, new Weapon(), new Effect());
         }
+
 
 
         //base functions
@@ -550,7 +551,6 @@ namespace HelloDungeon
             }
             return true;
         }
-
 
 
         //start - called before the first loop and initalizes variables

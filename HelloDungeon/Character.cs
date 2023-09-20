@@ -23,6 +23,10 @@ namespace HelloDungeon
         {
             public string _name;
             public Effect _effects;
+            public void DoStuff()
+        {
+            Console.WriteLine();
+        }
         }
 
     internal class Character
@@ -188,38 +192,6 @@ namespace HelloDungeon
                 proceed();
             }
         }
-        public void AssignStats(int selection)
-        {
-            if (selection == 1) //basketball player
-            {
-                Console.WriteLine("You picked Basketball Player");
-                player.health = 50;
-                player.strength = 0.5f;
-                player.dexterity = 2;
-                className = "BasketBall Player";
-                getWeapon(ref player, -1);
-
-            }
-            else if (selection == 2) //businessman
-            {
-                Console.WriteLine("You picked Businessman");
-                player.health = 30;
-                player.strength = 0;
-                player.dexterity = 0;
-                className = "Businessman";
-                getWeapon(ref player, -2);
-            }
-            else //selection 3 //hobo
-            {
-                Console.WriteLine("You picked Hobo");
-                player.health = 20;
-                player.strength = 0;
-                player.dexterity = 1;
-                className = "Hobo";
-                getWeapon(ref player, -3);
-            }
-            player.baseDamage = 1;
-        }
         public void Heal(float health)
         {
             _health += health;
@@ -254,13 +226,17 @@ namespace HelloDungeon
             }
             return false;
         }
-        public void PrintStats(Character print)
+        public void PrintStats()
         {
-            Console.WriteLine("Name: " + _name + "       Class: " + className + "\nHealth: " + _health + "\nStrength: " + _strength + "\nDexterity: " + _dexterity);
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);
         }
-        public void PrintBattleStats(Character player, Character printEnemy)
+        public void PrintBattleStats(Character printEnemy)
         {
-            Console.WriteLine("Name: " + _name + "      Class: " + className + "              Enemy: " + printEnemy.GetName() + "       Health: " + printEnemy.GetHealth() + "\nHealth: " + _health + "\nStrength: " + _strength + "\nDexterity: " + _dexterity);
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Enemy: " + printEnemy.GetName() + " HP: " + printEnemy.GetHealth());
         }
         public void AddToInventory(Item item)
         {
