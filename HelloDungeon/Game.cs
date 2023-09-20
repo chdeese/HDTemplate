@@ -31,10 +31,13 @@ namespace HelloDungeon
         {
             while (player.GetHealth() > 0 && enemy.GetHealth() > 0)
             {
-                player.PrintStats(player);
+                player.PrintBattleStats(enemy);
+                
+                //prints enemy's move and gives player a chance to react appropriately
+                int enemyDecision = EnemyChoice();
+                Console.WriteLine("------------------------------------------");
 
                 int playerChoice = GetInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
-                int enemyDecision = EnemyChoice();
                 float playerDamageDone = 0;
                 float enemyDamageDone = 0;
 
@@ -214,22 +217,26 @@ namespace HelloDungeon
             {
                 if (Chance(ref player, 3) && enemy.GetHealth() <= halfHealthAmount)
                 {
+                    Console.WriteLine("The " + enemy.GetName() + " is charging up an attack!!");
                     return 1;
                 }
                 else
                 {
                     if (Chance(ref player, -3))
                     {
+                        Console.WriteLine("The " + enemy.GetName() + " is attacking!!");
                         return 2;
                     }
                     else
                     {
                         if (Chance(ref player, 2))
                         {
+                            Console.WriteLine("The " + enemy.GetName() + " is preparing for you to strike!!");
                             return 3;
                         }
                         else
                         {
+                            Console.WriteLine("The " + enemy.GetName() + " is about to jump out of the way!!");
                             return 4;
                         }
                     }
@@ -321,7 +328,7 @@ namespace HelloDungeon
                 Console.Clear();
                 Proceed();
 
-                player.PrintStats(player);
+                player.PrintStats();
 
                 if (GetInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
                 {
@@ -413,7 +420,7 @@ namespace HelloDungeon
             }
             else
             {
-                quitGame();
+                QuitGame();
             }
 
         }
@@ -535,7 +542,7 @@ namespace HelloDungeon
         bool QuitGame()
         {
             int response = 0;
-            response = getInput("Do you want to play again?", "Yes", "No", "", "", "");
+            response = GetInput("Do you want to play again?", "Yes", "No", "", "", "");
 
             if (response == 2)
             {
@@ -553,8 +560,8 @@ namespace HelloDungeon
             playerAlive = true;
             stageNumber = 1;
 
-            characterCreation();
-            createEnemies(ref enemies);
+            CharacterCreation();
+            CreateEnemies(ref enemies);
         }
 
         //update - called every time the game loops, like player input, character postions, game logic
@@ -573,7 +580,7 @@ namespace HelloDungeon
                 playerAlive = true;
                 Stage(stageNumber);
                 stageNumber++;
-                proceed();
+                Proceed();
             }
         }
 
