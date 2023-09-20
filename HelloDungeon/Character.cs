@@ -17,20 +17,21 @@ namespace HelloDungeon
         {
             public string _name;
             public float _damage;
-            public float _duration;
+            public int _duration;
         }
-        struct Item
-        {
-            public string _name;
-            public Effect _effects;
-            public void DoStuff()
-        {
-            Console.WriteLine();
-        }
-        }
+        
 
     internal class Character
     {
+        public Character()
+        {
+            //returns default Character
+            _name = "";
+            _health = 0f;
+            _strength = 0f;
+            _baseDamage = 0f;
+            _dexterity = 0f;
+        }
         public Character(string name, float health, float strength, float damage, float dexterity, Weapon weapon, Effect ailment)
         {
             //returns new Character
@@ -64,6 +65,10 @@ namespace HelloDungeon
         {
             return _health;
         }
+        public void SetHealth(float health)
+        {
+            _health += health;
+        }
         public float GetStrength()
         {
             return _strength;
@@ -79,6 +84,15 @@ namespace HelloDungeon
         public Effect GetAilment()
         {
             return _ailment;
+        }
+        public void SetAilmentDuration(int newValue)
+        {
+            _ailment._duration = newValue;
+            if (newValue <= 0)
+            {
+                Effect none = new Effect();
+                _ailment = none;
+            }
         }
         public Weapon GetWeapon()
         {
@@ -131,6 +145,10 @@ namespace HelloDungeon
         //}
 
         //requires an invincible bool inside of the calling function to check if dodge was successful
+        public void Heal(float health)
+        {
+            _health += health;
+        }
         void UseItem()
         {
             int selection = 0;
@@ -192,10 +210,7 @@ namespace HelloDungeon
                 proceed();
             }
         }
-        public void Heal(float health)
-        {
-            _health += health;
-        }
+
 
 
 
@@ -231,46 +246,6 @@ namespace HelloDungeon
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);
         }
-        public void PrintBattleStats(Character printEnemy)
-        {
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);
-            Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Enemy: " + printEnemy.GetName() + " HP: " + printEnemy.GetHealth());
-        }
-        public void AddToInventory(Item item)
-        {
-            if (playerInv[0].name == null)
-            {
-                playerInv[0] = item;
-            }
-            else if (playerInv[1].name == null)
-            {
-                playerInv[1] = item;
-            }
-            else
-            {
-                int x = 0;
-                int y = 0;
-                x = getInput("Inventory is full, would you like to overwrite an item?", "Yes", "No", "", "", "");
-                if (x == 1)
-                {
-                    y = getInput("Which Item do you want to replace with " + item.name + "?", playerInv[0].name, playerInv[1].name, "", "", "");
-                    if (y == 1)
-                    {
-                        playerInv[0] = item;
-                    }
-                    else
-                    {
-                        playerInv[1] = item;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("You put back " + item.name);
-                }
-            }
 
-        }
     }
 }

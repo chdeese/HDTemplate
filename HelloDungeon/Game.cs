@@ -37,7 +37,7 @@ namespace HelloDungeon
                 int enemyDecision = EnemyChoice();
                 Console.WriteLine("------------------------------------------");
 
-                int playerChoice = GetInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
+                int playerChoice = PlayerCharacter.GetInput("What will you do?", "Heavy Attack", "Light Attack", "Shield", "Dodge", "Use Item");
                 float playerDamageDone = 0;
                 float enemyDamageDone = 0;
 
@@ -54,15 +54,15 @@ namespace HelloDungeon
                     }
                     else if (enemyDecision == 3)
                     {
-                        if (shield(enemy, ref PlayerCharacter))
+                        if (PlayerCharacter.Shield(enemy, ref PlayerCharacter))
                         {
                             playerDamageDone = (strongAttack(PlayerCharacter, ref enemy) / 2);
-                            Console.WriteLine(enemy.name + " blocked the attack!! They took " + playerDamageDone + " damage!");
+                            Console.WriteLine(enemy.GetName() + " blocked the attack!! They took " + playerDamageDone + " damage!");
                         }
                         else
                         {
                             playerDamageDone = strongAttack(PlayerCharacter, ref enemy);
-                            Console.WriteLine(enemy.name + " failed to block the attack!! They took " + playerDamageDone + " damage!");
+                            Console.WriteLine(enemy.GetName() + " failed to block the attack!! They took " + playerDamageDone + " damage!");
                         }
                     }
                 }
@@ -170,7 +170,7 @@ namespace HelloDungeon
                 //then do damage
                 enemy.TakeDamage(playerDamageDone);
                 PlayerCharacter.TakeDamage(enemyDamageDone);
-                BonusDamage();
+                PlayerCharacter.BonusDamage();
             }
             WinResult();
         }
@@ -192,44 +192,30 @@ namespace HelloDungeon
             }
         }
 
-        void BonusDamage()
-        {
-            if (PlayerCharacter.GetAilment().duration != 0)
-            {
-                Console.WriteLine(PlayerCharacter.name + " took " + PlayerCharacter.ailment.damage + " from " + PlayerCharacter.ailment.name + "!!");
-                PlayerCharacter.health -= PlayerCharacter.ailment.damage;
-                PlayerCharacter.ailment.duration--;
-            }
-            if (enemy.GetAilment().duration != 0)
-            {
-                Console.WriteLine("The " + enemy.GetName() + " took " + enemy.ailment.GetDamage() + " from " + enemy.GetAilment().name + "!!");
-            }
-        }
-
         int EnemyChoice()
         {
             float halfHealthAmount = enemy.GetHealth() / 2;
-            if (Chance(ref PlayerCharacter, -3) && (enemy.GetHealth() > halfHealthAmount))
+            if (Chance(PlayerCharacter, -3) && (enemy.GetHealth() > halfHealthAmount))
             {
                 return 1;
             }
             else
             {
-                if (Chance(ref PlayerCharacter, 3) && enemy.GetHealth() <= halfHealthAmount)
+                if (Chance(PlayerCharacter, 3) && enemy.GetHealth() <= halfHealthAmount)
                 {
                     Console.WriteLine("The " + enemy.GetName() + " is charging up an attack!!");
                     return 1;
                 }
                 else
                 {
-                    if (Chance(ref PlayerCharacter, -3))
+                    if (Chance(PlayerCharacter, -3))
                     {
                         Console.WriteLine("The " + enemy.GetName() + " is attacking!!");
                         return 2;
                     }
                     else
                     {
-                        if (Chance(ref PlayerCharacter, 2))
+                        if (Chance(PlayerCharacter, 2))
                         {
                             Console.WriteLine("The " + enemy.GetName() + " is preparing for you to strike!!");
                             return 3;
@@ -246,7 +232,7 @@ namespace HelloDungeon
 
 
         //support functions
-        bool Chance(ref Character enemy, int mod)
+        bool Chance(Character enemy, int mod)
         {  
             //pass 1 for %100, 2 for %50, 3 for #30, 5 for %10, -3 for %70, and -5 for %90
             if (mod == 1)
@@ -296,20 +282,20 @@ namespace HelloDungeon
             if (selection == 1) //basketball player
             {
                 Console.WriteLine("You picked Basketball Player");
-                PlayerCharacter = new Character("", 50, 0.5f, 1, 2, GetWeapon(-1), none);
+                PlayerCharacter = new Player("", 50, 0.5f, 1, 2, GetWeapon(-1), none);
                 className = "BasketBall Player";
 
             }
             else if (selection == 2) //businessman
             {
                 Console.WriteLine("You picked Businessman");
-                PlayerCharacter = new Character("", 30, 0, 1, 0, GetWeapon(-2), none);
+                PlayerCharacter = new Player("", 30, 0, 1, 0, GetWeapon(-2), none);
                 className = "Businessman";
             }
             else //selection 3 //hobo
             {
                 Console.WriteLine("You picked Hobo");
-                PlayerCharacter = new Character("", 20, 0, 1, 1, GetWeapon(-3), none);
+                PlayerCharacter = new Player("", 20, 0, 1, 1, GetWeapon(-3), none);
                 className = "Hobo";
             }
         }
@@ -319,18 +305,18 @@ namespace HelloDungeon
             bool selectedClass = false;
             while (!selectedClass)
             {
-                int x = GetInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
+                int x = PlayerCharacter.GetInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
                 AssignStats(x);
 
                 //have a starting weapon and choose to drop it
 
-                PlayerCharacter.SetName(GetText("Enter character name"));
+                PlayerCharacter.SetName(PlayerCharacter.GetText("Enter character name"));
                 Console.Clear();
                 Proceed();
 
                 PlayerCharacter.PrintStats();
 
-                if (GetInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
+                if (PlayerCharacter.GetInput("Would you like to keep this selection?", "Yes", "Nahh", "", "", "") == 1)
                 {
                     selectedClass = true;
                 }
@@ -437,102 +423,6 @@ namespace HelloDungeon
 
 
         //base functions
-        int GetInput(string prompt, string option1, string option2, string option3, string option4, string option5)
-        {  
-            //option 3-5 are optional and can toggled out by entering "" into the parameter slots for 3-5 when calling the function
-            string userInput = "";
-            int result = 0;
-            while (result != 1 && result != 2 && !(result == 3 && option3 != "") && !(result == 4 && option4 != "") && !(result == 5 && option5 != ""))
-            {
-                Console.WriteLine(prompt);
-                Console.WriteLine("1. " + option1 + "\n2. " + option2);
-                if (option3 != "")
-                {
-                    Console.WriteLine("3. " + option3);
-                    if (option4 != "")
-                    {
-                        Console.WriteLine("4. " + option4);
-                        if (option5 != "")
-                        {
-                            Console.WriteLine("5. " + option5);
-                        }
-                    }
-                }
-                Console.Write("> ");
-
-                userInput = Console.ReadLine();
-                if (userInput != "1" && userInput != "2" && !(userInput == "3" && option3 != "") && !(userInput == "4" && option4 != "") && !(userInput == "5" && option5 != ""))
-                {
-                    Console.WriteLine("Invalid Input, to try again, press any key.");
-                    userInput = "";
-                    Console.ReadKey(true);
-                    continue;
-                }
-                else if (userInput == "1")
-                {
-                    result = 1;
-                }
-                else if (userInput == "2")
-                {
-                    result = 2;
-                }
-                else if (option3 != "")
-                {
-                    if (userInput == "3")
-                    {
-                        result = 3;
-                    }
-                    if (option4 != "")
-                    {
-                        if (userInput == "4")
-                        {
-                            result = 4;
-                        }
-                        if (option5 != "")
-                        {
-                            if (userInput == "5")
-                            {
-                                result = 5;
-                            }
-                        }
-                    }
-                }
-
-            }
-            Console.Clear();
-            return result;
-
-        }
-
-        string GetText(string prompt)
-        {
-            string text = "";
-
-            while (text == "")
-            {
-                //display prompt and recieve input
-                Console.Write(prompt + "\n> ");
-                text = Console.ReadLine();
-                Console.WriteLine();
-
-                //check input
-                if (text != "" && text != null)
-                {
-                    Console.WriteLine(text);
-                    return text;
-                }
-
-                //reset if input is incorrect
-                Console.WriteLine("Please enter text" +
-                    "\n--Press any key to continue--");
-                Console.ReadKey(true);
-                Console.Clear();
-                text = "";
-
-            }
-            return "Bob";
-        }
-
         void Proceed()
         {
             Console.WriteLine("Press any key to proceed.");
