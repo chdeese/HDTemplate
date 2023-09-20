@@ -241,7 +241,7 @@ namespace HelloDungeon
             }
             return false;
         }
-        public void PrintStats()
+        public virtual void PrintStats()
         {
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);

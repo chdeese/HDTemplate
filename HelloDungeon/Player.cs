@@ -86,10 +86,12 @@ namespace HelloDungeon
 
                 if(userInput == "1")
                 {
+                    _playerChoice = 1;
                     return 1;
                 }
                 else if (userInput == "2")
                 {
+                    _playerChoice = 2;
                     return 2;
                 }
                 else
@@ -119,15 +121,65 @@ namespace HelloDungeon
 
                 if (userInput == "1")
                 {
+
+                    _playerChoice = 1;
                     return 1;
                 }
                 else if (userInput == "2")
                 {
+                    _playerChoice = 2;
                     return 2;
                 }
                 else if (userInput == "3")
                 {
+
+                    _playerChoice = 3;
                     return 3;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Input, try again.");
+                    Console.ReadKey(true);
+                    Console.Clear();
+                }
+            }
+            return 0;
+        }
+
+        public int GetInput(string prompt, string option1, string option2, string option3, string option4)
+        {
+            string userInput = "";
+
+            while (userInput != "1" && userInput != "2" && userInput != "3" && userInput != "4")
+            {
+
+                Console.WriteLine(prompt);
+                Console.WriteLine("1. " + option1 + "\n2. " + option2 + "\n3. " + option3 + "\n4. " + option4);
+
+                Console.Write("> ");
+
+                userInput = Console.ReadLine();
+                Console.WriteLine();
+
+                if (userInput == "1")
+                {
+                    _playerChoice = 1;
+                    return 1;
+                }
+                else if (userInput == "2")
+                {
+                    _playerChoice = 2;
+                    return 2;
+                }
+                else if (userInput == "3")
+                {
+                    _playerChoice = 3;
+                    return 3;
+                }
+                else if (userInput == "4")
+                {
+                    _playerChoice = 4;
+                    return 4;
                 }
                 else
                 {
@@ -156,22 +208,27 @@ namespace HelloDungeon
 
                 if (userInput == "1")
                 {
+                    _playerChoice = 1;
                     return 1;
                 }
                 else if (userInput == "2")
                 {
+                    _playerChoice = 2;
                     return 2;
                 }
                 else if (userInput == "3")
                 {
+                    _playerChoice = 3;
                     return 3;
                 }
                 else if (userInput == "4")
                 {
+                    _playerChoice = 4;
                     return 4;
                 }
                 else if (userInput == "5")
                 {
+                    _playerChoice = 5;
                     return 5;
                 }
                 else
@@ -225,6 +282,13 @@ namespace HelloDungeon
             Console.WriteLine("Name: " + _name + "    Health: " + _health + "\nStrength: " + _strength + "    Dexterity: " + _dexterity);
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Enemy: " + printEnemy.GetName() + " HP: " + printEnemy.GetHealth());
+        }
+
+        //override overrides higher higharchy function when called.
+        public override void PrintStats()
+        {
+            base.PrintStats();
+            //additional stats only for the player
         }
     }
 }
