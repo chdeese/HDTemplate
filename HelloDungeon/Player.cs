@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,13 +17,16 @@ namespace HelloDungeon
     internal class Player : Character
     {
         private int _playerChoice;
+        private int _playerLives;
         public Player() : base()
         {
             _playerChoice = 0;
+            _playerLives = 3;
         }
         public Player(string name, float health, float strength, float damage, float dexterity, Weapon weapon, Effect ailment) : base(name, health, strength, damage, dexterity, weapon, ailment)
         {
             _playerChoice = 0;
+            _playerLives = 0;
         }
 
         public void BonusDamage(ref Character enemy)
@@ -288,6 +291,7 @@ namespace HelloDungeon
         public override void PrintStats()
         {
             base.PrintStats();
+            Console.WriteLine("Lives: " + _playerLives);
             //additional stats only for the player
         }
     }
