@@ -127,29 +127,6 @@ namespace HelloDungeon
         //}
 
         //requires an invincible bool inside of the calling function to check if dodge was successful
-        bool Dodge(ref Character receiver)
-        {
-
-            //if dodge is successful, pass a true bool to the invincible bool 
-            if (chance(ref receiver, 2))
-            {
-                return true;
-            }
-            return false;
-        }
-        bool Shield(Character initiator, ref Character receiver)
-        {
-            if (chance(ref receiver, 2))
-            {
-                return true;
-            }
-            else
-            {
-                Console.WriteLine(initiator.name + " failed to block!!");
-            }
-            return false;
-        }
-
         void UseItem()
         {
             int selection = 0;
@@ -243,13 +220,47 @@ namespace HelloDungeon
             }
             player.baseDamage = 1;
         }
+        public void Heal(float health)
+        {
+            _health += health;
+        }
+
+
+
+        //WIP
+
+
+
+
+        bool Dodge(ref Character receiver)
+        {
+
+            //if dodge is successful, pass a true bool to the invincible bool 
+            if (chance(ref receiver, 2))
+            {
+                return true;
+            }
+            return false;
+        }
+        bool Shield(Character initiator, ref Character receiver)
+        {
+            if (chance(ref receiver, 2))
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(initiator.name + " failed to block!!");
+            }
+            return false;
+        }
         public void PrintStats(Character print)
         {
             Console.WriteLine("Name: " + _name + "       Class: " + className + "\nHealth: " + _health + "\nStrength: " + _strength + "\nDexterity: " + _dexterity);
         }
-        public void PrintStats(Character printPlayer, Character printEnemy)
+        public void PrintBattleStats(Character player, Character printEnemy)
         {
-            Console.WriteLine("Name: " + _name + "      Class: " + className + "              Enemy: " + printEnemy.name + "       Health: " + printEnemy.health + "\nHealth: " + _health + "\nStrength: " + _strength + "\nDexterity: " + _dexterity);
+            Console.WriteLine("Name: " + _name + "      Class: " + className + "              Enemy: " + printEnemy.GetName() + "       Health: " + printEnemy.GetHealth() + "\nHealth: " + _health + "\nStrength: " + _strength + "\nDexterity: " + _dexterity);
         }
         public void AddToInventory(Item item)
         {
@@ -285,10 +296,5 @@ namespace HelloDungeon
             }
 
         }
-        public void Heal(float health)
-        {
-            _health += health;
-        }
-
     }
 }

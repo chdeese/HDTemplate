@@ -23,6 +23,7 @@ namespace HelloDungeon
         Character[] enemies = new Character[3];
         Item[] items = new Item[5];
         Item[] playerInv = new Item[2];
+        Effect none;
 
 
         //battle functions
@@ -198,7 +199,7 @@ namespace HelloDungeon
             }
             if (enemy.GetAilment().duration != 0)
             {
-                Console.WriteLine("The " + enemy.GetName() + " took " + enemy.GetAilment().damage + " from " + enemy.GetAilment().name + "!!");
+                Console.WriteLine("The " + enemy.GetName() + " took " + enemy.ailment.GetDamage() + " from " + enemy.GetAilment().name + "!!");
             }
         }
 
@@ -283,6 +284,28 @@ namespace HelloDungeon
             return false;
         }
 
+        public void AssignStats(int selection)
+        {
+            if (selection == 1) //basketball player
+            {
+                Console.WriteLine("You picked Basketball Player");
+                player = new Character("", 50, 0.5f, 1, 2, GetWeapon(-1), none);
+                className = "BasketBall Player";
+
+            }
+            else if (selection == 2) //businessman
+            {
+                Console.WriteLine("You picked Businessman");
+                player = new Character("", 30, 0, 1, 0, GetWeapon(-2), none);
+                className = "Businessman";
+            }
+            else //selection 3 //hobo
+            {
+                Console.WriteLine("You picked Hobo");
+                player = new Character("", 20, 0, 1, 1, GetWeapon(-3), none);
+                className = "Hobo";
+            }
+        }
 
         void CharacterCreation()
         {
@@ -290,7 +313,7 @@ namespace HelloDungeon
             while (!selectedClass)
             {
                 int x = GetInput("Select your class.", "Basketball Player", "Business man", "Hobo", "", "");
-                player.AssignStats(x);
+                AssignStats(x);
 
                 //have a starting weapon and choose to drop it
 
@@ -307,55 +330,67 @@ namespace HelloDungeon
             }
         }
 
-        void GetWeapon(ref Character equipee, int selection)
+        Weapon GetWeapon(int selection)
         {
             if (selection == -1)
             {
-                equipee.weapon.name = "Ball";
-                equipee.weapon.damage = 1;
-                equipee.weapon.effect.name = "Blunt";
-                equipee.weapon.effect.damage = 0;
-                equipee.weapon.effect.duration = 0;
+                Weapon ball = new Weapon();
+                ball._name = "Ball";
+                ball._damage = 1;
+                ball._effect._name = "Blunt";
+                ball._effect._damage = 0;
+                ball._effect._duration = 0;
+                return ball;
             }
             else if (selection == -2)
             {
-                equipee.weapon.name = "Briefcase";
-                equipee.weapon.damage = 2;
-                equipee.weapon.effect.name = "Blunt";
-                equipee.weapon.effect.damage = 0;
-                equipee.weapon.effect.duration = 0;
+                Weapon briefcase = new Weapon();
+                briefcase._name = "Briefcase";
+                briefcase._damage = 2;
+                briefcase._effect._name = "Blunt";
+                briefcase._effect._damage = 0;
+                briefcase._effect._duration = 0;
+                return briefcase;
             }
             else if (selection == -3)
             {
-                equipee.weapon.name = "Unarmed";
-                equipee.weapon.damage = 0.5f;
-                equipee.weapon.effect.name = "Blunt";
-                equipee.weapon.effect.damage = 0;
-                equipee.weapon.effect.duration = 0;
+                Weapon unarmed = new Weapon();
+                unarmed._name = "Unarmed";
+                unarmed._damage = 0.5f;
+                unarmed._effect._name = "Blunt";
+                unarmed._effect._damage = 0;
+                unarmed._effect._duration = 0;
+                return unarmed;
             }
             else if (selection == 1)
             {
-                equipee.weapon.name = "Sword";
-                equipee.weapon.damage = 1.5f;
-                equipee.weapon.effect.name = "Bleeding";
-                equipee.weapon.effect.damage = 1.5f;
-                equipee.weapon.effect.duration = 3;
+                Weapon sword = new Weapon();
+                sword._name = "Sword";
+                sword._damage = 1.5f;
+                sword._effect._name = "Bleeding";
+                sword._effect._damage = 1.5f;
+                sword._effect._duration = 3;
+                return sword;
             }
             else if (selection == 2)
             {
-                equipee.weapon.name = "Needle";
-                equipee.weapon.damage = 0.4f;
-                equipee.weapon.effect.name = "Poison";
-                equipee.weapon.effect.damage = 1;
-                equipee.weapon.effect.duration = 5;
+                Weapon needle = new Weapon();
+                needle._name = "Needle";
+                needle._damage = 0.4f;
+                needle._effect._name = "Poison";
+                needle._effect._damage = 1;
+                needle._effect._duration = 5;
+                return needle;
             }
             else //selection 3
             {
-                equipee.weapon.name = "Long Stick";
-                equipee.weapon.damage = 6;
-                equipee.weapon.effect.name = "Finesse";
-                equipee.weapon.effect.damage = 0;
-                equipee.weapon.effect.duration = 0;
+                Weapon long_stick = new Weapon();
+                long_stick._name = "Long Stick";
+                long_stick._damage = 6;
+                long_stick._effect._name = "Finesse";
+                long_stick._effect._damage = 0;
+                long_stick._effect._duration = 0;
+                return long_stick;
             }
         }
 
